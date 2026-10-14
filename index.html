@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Ürün Maliyeti</title>
+<link rel="stylesheet" href="style.css">
+<script src="cost.js" defer></script><script src="app.js" defer></script>
+</head>
+<body>
+<main>
+<header><div class="brand">M / MALİYET</div><span>TEKSTİL ATÖLYESİ</span></header>
+<section class="intro"><p class="eyebrow">HER DETAYI HESABA KATIN</p><h1>Ürününüzün maliyeti,<br>tek bir yerde.</h1><p>Kumaşı hesaplayın, giderleri ekleyin ve ürün başına toplamı görün.</p></section>
+<div class="layout">
+<div>
+<section class="card"><div class="section-title"><span class="number">01</span><h2>Kumaş</h2></div><label for="product">Ürün adı <span>(isteğe bağlı)</span></label><input id="product" maxlength="120" placeholder="Örn. Basic tişört">
+<div class="fields"><div><label for="price">Kumaş fiyatı · TL/kg</label><input id="price" type="number" min="0" step="0.01" inputmode="decimal" placeholder="0,00"></div><div><label for="grams">Ürün başına kumaş · gram</label><input id="grams" type="number" min="0" step="0.1" inputmode="decimal" placeholder="0"></div></div>
+<p class="hint">Gramaj, bir ürün için kullanılan toplam kumaş ağırlığıdır; g/m² değildir.</p><div class="subtotal"><span>Kumaş maliyeti / ürün</span><strong id="fabric">₺0,00</strong></div></section>
+<section class="card"><div class="section-title"><span class="number">02</span><h2>Diğer giderler</h2></div><p class="hint">Her gideri bir ürün için TL cinsinden girin.</p><div id="expenses"></div><button id="add" class="add" type="button">+ Gider ekle</button></section>
+</div>
+<aside><section class="summary"><p class="eyebrow">ÜRÜN BAŞINA</p><h2>Toplam maliyet</h2><div id="total" class="total" aria-live="polite">₺0,00</div><div id="breakdown"></div><p class="summary-note">Kumaş ve eklediğiniz tüm giderlerin toplamı.</p></section><p id="save-status" class="save-status">Bilgiler bu tarayıcıda otomatik saklanır.</p><button id="reset" class="reset" type="button">Hesabı sıfırla</button></aside>
+</div><footer>Küçük detaylar, doğru hesaplar.</footer>
+</main>
+</body></html>
