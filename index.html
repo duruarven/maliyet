@@ -4,7 +4,11 @@
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Ürün Maliyeti</title>
 <link rel="stylesheet" href="style.css">
-<script src="cost.js" defer></script><script src="app.js" defer></script>
+<script src="cost.js" defer></script>
+<script src="vendor/jspdf.umd.min.js" defer></script>
+<script src="vendor/report-font.js" defer></script>
+<script src="report.js" defer></script>
+<script src="app.js" defer></script>
 </head>
 <body>
 <main>
@@ -17,7 +21,19 @@
 <p class="hint">Gramaj, bir ürün için kullanılan toplam kumaş ağırlığıdır; g/m² değildir.</p><div class="subtotal"><span>Kumaş maliyeti / ürün</span><strong id="fabric">₺0,00</strong></div></section>
 <section class="card"><div class="section-title"><span class="number">02</span><h2>Diğer giderler</h2></div><p class="hint">Her gideri bir ürün için TL cinsinden girin.</p><div id="expenses"></div><button id="add" class="add" type="button">+ Gider ekle</button></section>
 </div>
-<aside><section class="summary"><p class="eyebrow">ÜRÜN BAŞINA</p><h2>Toplam maliyet</h2><div id="total" class="total" aria-live="polite">₺0,00</div><div id="breakdown"></div><p class="summary-note">Kumaş ve eklediğiniz tüm giderlerin toplamı.</p></section><p id="save-status" class="save-status">Bilgiler bu tarayıcıda otomatik saklanır.</p><button id="reset" class="reset" type="button">Hesabı sıfırla</button></aside>
+<aside><section class="summary"><p class="eyebrow">ÜRÜN BAŞINA</p><h2>Toplam maliyet</h2><div id="total" class="total" aria-live="polite">₺0,00</div><div id="breakdown"></div><p class="summary-note">Kumaş ve eklediğiniz tüm giderlerin toplamı.</p></section>
+<section class="export-card" aria-labelledby="export-title">
+<h2 id="export-title">Kaydet ve paylaş</h2>
+<p class="hint">Ürün bilgileri, giderler ve toplam maliyet tek dosyada.</p>
+<div class="export-actions">
+<button id="download-csv" class="export-button" type="button">Hesabı indir <span>CSV · Excel için</span></button>
+<button id="save-pdf" class="export-button" type="button">PDF olarak kaydet <span>Yazdırmaya ve göndermeye hazır</span></button>
+<button id="share" class="export-button share-button" type="button">Müşteriyle paylaş <span>PDF veya hesap özeti gönder</span></button>
+</div>
+<p id="share-hint" class="hint">iPhone’da paylaş menüsünden WhatsApp, Mail veya Dosyalara Kaydet’i seçebilirsiniz.</p>
+<p id="export-status" class="export-status" role="status" aria-live="polite" aria-atomic="true"></p>
+</section>
+<p id="save-status" class="save-status">Bilgiler bu tarayıcıda otomatik saklanır.</p><button id="reset" class="reset" type="button">Hesabı sıfırla</button></aside>
 </div><footer>Küçük detaylar, doğru hesaplar.</footer>
 </main>
 </body></html>
