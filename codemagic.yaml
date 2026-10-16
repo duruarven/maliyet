@@ -1,0 +1,57 @@
+workflows:
+  ios-testflight:
+    name: iOS • TestFlight
+    instance_type: mac_mini_m2
+    max_build_duration: 60
+    integrations:
+      app_store_connect: App Store Connect
+    environment:
+      ios_signing:
+        distribution_type: app_store
+        bundle_identifier: com.duruarven.giyimmaliyethesaplama
+      groups:
+        - app_store
+      vars:
+        XCODE_PROJECT: ios/Maliyet.xcodeproj
+        XCODE_SCHEME: Maliyet
+      xcode: latest
+      node: 24
+    scripts:
+      - name: Validate App Store configuration
+        script: |
+          set -euo pipefail
+          : "${APP_STORE_APPLE_ID:?Set the numeric App Store Connect app ID in the app_store variable group}"
+      - name: Install and test
+        script: |
+          set -euo pipefail
+          npm ci
+          npm test
+          npx playwright install chromium
+          npm run test:browser
+      - name: Generate offline iOS project
+        script: |
+          set -euo pipefail
+          if ! command -v xcodegen >/dev/null; then brew install xcodegen; fi
+          npm run ios:generate
+      - name: Apply App Store signing profiles
+        script: xcode-project use-profiles
+      - name: Set unique build number
+        script: |
+          set -euo pipefail
+          LATEST_BUILD=$(app-store-connect get-latest-testflight-build-number "$APP_STORE_APPLE_ID")
+          [[ "$LATEST_BUILD" =~ ^[0-9]+$ ]] || { echo "Invalid TestFlight build number"; exit 1; }
+          cd ios
+          agvtool new-version -all "$((LATEST_BUILD + 1))"
+      - name: Build signed IPA
+        script: |
+          set -euo pipefail
+          xcode-project build-ipa --project "$XCODE_PROJECT" --scheme "$XCODE_SCHEME"
+    artifacts:
+      - build/ios/ipa/*.ipa
+      - /tmp/xcodebuild_logs/*.log
+      - $HOME/Library/Developer/Xcode/Archives/**/*.dSYM
+    publishing:
+      app_store_connect:
+        auth: integration
+        submit_to_testflight: true
+        submit_to_app_store: false

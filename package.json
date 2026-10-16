@@ -5,7 +5,9 @@
   "scripts": {
     "start": "python3 -m http.server 3000 --bind 0.0.0.0",
     "test": "node --test",
-    "test:browser": "node tests/browser.cjs"
+    "test:browser": "node tests/browser.cjs",
+    "ios:prepare": "node scripts/prepare-ios.cjs",
+    "ios:generate": "npm run ios:prepare && cd ios && xcodegen generate"
   },
   "devDependencies": {
     "playwright": "1.64.1"

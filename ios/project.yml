@@ -1,0 +1,45 @@
+name: Maliyet
+options:
+  bundleIdPrefix: com.duruarven
+  deploymentTarget:
+    iOS: '15.0'
+settings:
+  base:
+    SWIFT_VERSION: '5.0'
+    MARKETING_VERSION: '1.0.0'
+    CURRENT_PROJECT_VERSION: '1'
+    VERSIONING_SYSTEM: apple-generic
+targets:
+  Maliyet:
+    type: application
+    platform: iOS
+    sources:
+      - path: Maliyet
+        excludes: [Web, Info.plist]
+      - path: Maliyet/Web
+        type: folder
+        buildPhase: resources
+    info:
+      path: Maliyet/Info.plist
+      properties:
+        CFBundleDisplayName: Giyim Maliyet Hesaplama
+        CFBundleShortVersionString: $(MARKETING_VERSION)
+        CFBundleVersion: $(CURRENT_PROJECT_VERSION)
+        UILaunchScreen: {}
+        UISupportedInterfaceOrientations: [UIInterfaceOrientationPortrait, UIInterfaceOrientationLandscapeLeft, UIInterfaceOrientationLandscapeRight]
+        UISupportedInterfaceOrientations~ipad: [UIInterfaceOrientationPortrait, UIInterfaceOrientationPortraitUpsideDown, UIInterfaceOrientationLandscapeLeft, UIInterfaceOrientationLandscapeRight]
+        UIFileSharingEnabled: false
+        LSSupportsOpeningDocumentsInPlace: true
+        ITSAppUsesNonExemptEncryption: false
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.duruarven.giyimmaliyethesaplama
+        TARGETED_DEVICE_FAMILY: '1,2'
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+schemes:
+  Maliyet:
+    build:
+      targets:
+        Maliyet: all
+    archive:
+      config: Release

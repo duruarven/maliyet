@@ -1,3 +1,9 @@
 node_modules/
 test-results/
 playwright-report/
+ios/Maliyet/Web/
+ios/Maliyet/Info.plist
+ios/*.xcodeproj/
+build/
+*.ipa
+*.dSYM.zip

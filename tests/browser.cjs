@@ -223,6 +223,49 @@ async function exercise(browser, options, label, url, directory) {
   }
 }
 
+async function exerciseNativeBridge(browser, url) {
+  const context = await browser.newContext();
+  await context.addInitScript(() => {
+    window.__nativeRequests = [];
+    window.__nativeStatus = 'completed';
+    window.webkit = { messageHandlers: { exportFile: { postMessage(message) {
+      window.__nativeRequests.push(message);
+      setTimeout(() => NativeExport.complete(message.id, window.__nativeStatus), 0);
+    } } } };
+  });
+  try {
+    const page = await context.newPage();
+    await page.goto(url);
+    await page.locator('#product').fill('İlmek müşteri raporu');
+    await page.locator('#price').fill('200');
+    await page.locator('#grams').fill('250');
+    for (const [selector, action, extension] of [
+      ['#save-pdf', 'save', 'pdf'], ['#share', 'share', 'pdf'], ['#download-csv', 'save', 'csv'],
+    ]) {
+      await page.locator(selector).click();
+      await page.waitForFunction(() => document.getElementById('export-status').textContent.length > 0);
+      const message = await page.evaluate(() => window.__nativeRequests.at(-1));
+      assert.equal(message.action, action);
+      assert.ok(message.filename.endsWith('.' + extension));
+      const bytes = Buffer.from(message.data, 'base64');
+      if (extension === 'pdf') assert.equal(bytes.subarray(0, 5).toString(), '%PDF-');
+      else assert.ok(bytes.toString('utf8').includes('50,00'));
+      await page.locator('#product').fill('İlmek müşteri raporu ' + extension);
+    }
+    await page.evaluate(() => { window.__nativeStatus = 'cancelled'; });
+    await page.locator('#save-pdf').click();
+    await waitForStatus(page, 'Kaydetme iptal');
+    await page.locator('#share').click();
+    await waitForStatus(page, 'Paylaşım iptal');
+    await assertButtonsReady(page);
+    await page.evaluate(() => { window.__nativeStatus = 'error'; });
+    await page.locator('#share').click();
+    await waitForStatus(page, 'Paylaşım açılamadı');
+    await assertButtonsReady(page);
+    console.log('PASS iOS bridge: PDF/CSV bytes, save/share routing, cancellation and error recovery');
+  } finally { await context.close(); }
+}
+
 async function main() {
   const directory = await fsp.mkdtemp(path.join(os.tmpdir(), 'maliyet-browser-'));
   const { server, url } = await serve();
@@ -234,6 +277,7 @@ async function main() {
     browser = await chromium.launch({ headless: true, ...(executablePath ? { executablePath } : {}) });
     await exercise(browser, { viewport: { width: 1280, height: 900 } }, 'desktop', url, directory);
     await exercise(browser, devices['iPhone 13'], 'iphone-13-emulation', url, directory);
+    await exerciseNativeBridge(browser, url);
     console.log('iPhone checks use Chromium device emulation and mocked Web Share; a physical iPhone share sheet requires a device check.');
     passed = true;
   } finally {

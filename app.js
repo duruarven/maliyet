@@ -81,30 +81,37 @@ function downloadFile(blob, filename) {
   setTimeout(() => URL.revokeObjectURL(url), 60000);
 }
 
-byId('download-csv').addEventListener('click', () => {
+async function saveFile(blob, filename) {
+  if (NativeExport.available()) return NativeExport.send(blob, filename, 'save');
+  downloadFile(blob, filename);
+}
+
+byId('download-csv').addEventListener('click', async () => {
   const report = currentReport();
   if (!report) return;
   try {
-    downloadFile(new Blob([CostReport.toCsv(report)], { type: 'text/csv;charset=utf-8' }), CostReport.filename(report, 'csv'));
-    exportStatus('CSV dosyası hazır. İndirilenler’den Excel veya Numbers ile açabilirsiniz.');
-  } catch {
+    await saveFile(new Blob([CostReport.toCsv(report)], { type: 'text/csv;charset=utf-8' }), CostReport.filename(report, 'csv'));
+    exportStatus(NativeExport.available() ? 'CSV seçtiğiniz konuma kaydedildi.' : 'CSV dosyası hazır. İndirilenler’den Excel veya Numbers ile açabilirsiniz.');
+  } catch (error) {
+    if (error?.name === 'AbortError') { exportStatus('Kaydetme iptal edildi.'); return; }
     exportStatus('Hesap indirilemedi. Lütfen yeniden deneyin.');
   }
 });
 
-byId('save-pdf').addEventListener('click', () => {
+byId('save-pdf').addEventListener('click', async () => {
   const report = currentReport();
   if (!report) return;
   try {
-    downloadFile(CostReport.toPdf(report), CostReport.filename(report, 'pdf'));
-    exportStatus('PDF dosyası hazır. iPhone’da önizleme açılırsa Paylaş → Dosyalara Kaydet’i seçin.');
-  } catch {
+    await saveFile(CostReport.toPdf(report), CostReport.filename(report, 'pdf'));
+    exportStatus(NativeExport.available() ? 'PDF seçtiğiniz konuma kaydedildi.' : 'PDF dosyası hazır. iPhone’da önizleme açılırsa Paylaş → Dosyalara Kaydet’i seçin.');
+  } catch (error) {
+    if (error?.name === 'AbortError') { exportStatus('Kaydetme iptal edildi.'); return; }
     exportStatus('PDF oluşturulamadı. Lütfen yeniden deneyin veya hesabı CSV olarak indirin.');
   }
 });
 
 const nativeShareAvailable = () => window.isSecureContext && typeof navigator.share === 'function';
-if (!nativeShareAvailable()) {
+if (!NativeExport.available() && !nativeShareAvailable()) {
   byId('share-hint').textContent = 'Bu tarayıcıda paylaş menüsü desteklenmiyor. PDF’yi kaydedip müşterinize gönderebilirsiniz.';
 }
 
@@ -115,6 +122,11 @@ byId('share').addEventListener('click', async () => {
   buttons.forEach(button => { button.disabled = true; });
   byId('share').setAttribute('aria-busy', 'true');
   try {
+    if (NativeExport.available()) {
+      await NativeExport.send(CostReport.toPdf(report), CostReport.filename(report, 'pdf'), 'share');
+      exportStatus('PDF paylaşım uygulamasına aktarıldı.');
+      return;
+    }
     if (!nativeShareAvailable()) {
       downloadFile(CostReport.toPdf(report), CostReport.filename(report, 'pdf'));
       exportStatus('Bu tarayıcıda paylaş menüsü desteklenmiyor. Hazırlanan PDF’yi indirip müşterinize gönderebilirsiniz.');
@@ -148,3 +160,5 @@ byId('share').addEventListener('click', async () => {
   }
 });
 render();
+
+if (NativeExport.available()) byId('save-status').textContent = 'Bilgiler bu cihazda otomatik saklanır.';

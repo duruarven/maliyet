@@ -40,3 +40,7 @@ npm run test:browser
 ```
 
 Sistemde `/usr/bin/chromium` varsa testler onu kullanır. Başka bir kurulum için `PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH` verilebilir. Tarayıcı testleri kendi geçici sunucusunu başlatır; indirme, PDF, mobil görünüm ve paylaşım API’sinin başarı/iptal/hata durumlarını sınar. iPhone paylaş menüsü otomasyonda taklit edilir; gerçek WhatsApp/Mail gönderimi cihazda elle doğrulanmalıdır.
+
+## iOS uygulaması ve TestFlight
+
+**Giyim Maliyet Hesaplama** iOS uygulaması, hesaplayıcıyı çevrimdışı paketler. PDF/CSV için yerel Dosyalara Kaydet, PDF için iOS müşteri paylaşım ekranı sunar. Mac kurulumu, Codemagic imzalama ve TestFlight adımları: [iOS kurulum rehberi](ios/README.md). İş akışı: [`codemagic.yaml`](codemagic.yaml).
